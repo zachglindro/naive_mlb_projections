@@ -5,7 +5,7 @@ import data
 
 data.get(2015, 2023)
 print('Loading data...')
-pairs = data.load(2015, 2022)
+pairs = data.load(2015, 2023)
 
 def startLinear():
     print('\nTraining model...')
@@ -15,7 +15,7 @@ def startLinear():
     
     # Train model
     regression = linear_model.LinearRegression()
-    regression.fit(pairs[['Barrel%_prev', 'wRC+_prev', 'K%_prev', 'BB%_prev', 'Age_prev']], pairs['wRC+_curr'])
+    regression.fit(X_train, y_train)
 
     print(f'Score: {regression.score(X_test, y_test)}')
 

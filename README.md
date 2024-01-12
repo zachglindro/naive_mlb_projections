@@ -1,1 +1,1 @@
-Projects next-season wRC+ based on previous season wRC+, Barrel%, K%, BB%, and age using linear regression. Model is trained from 2015-2022 data, excluding 2020.
+Projects next-season wRC+ based on previous season wRC+, Barrel%, K%, BB%, and age using linear regression. Model is trained from 2015-2023 data, excluding 2020.
