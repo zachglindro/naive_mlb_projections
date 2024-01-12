@@ -14,17 +14,17 @@ def get(start_year=DEFAULT_START_YEAR, end_year=DEFAULT_END_YEAR, exclude_2020=T
         if season == 2020 and exclude_2020:
             continue
         
-        if os.path.exists(f'data/batting_{season}.csv') and not force_update:
+        if os.path.exists(f'data/batting_{season}.tsv') and not force_update:
             continue
 
         print(f'Getting data for {season}...')
         data = pb.batting_stats(season, qual=300, ind=1)
 
-        data.to_csv(f'data/batting_{season}.csv', index=False, sep='|')
+        data.to_csv(f'data/batting_{season}.tsv', index=False, sep='|')
 
     return 0
 
-# Load data from the csv files
+# Load data from the tsv files
 def load(start_year=DEFAULT_START_YEAR, end_year=DEFAULT_END_YEAR):
     pairs = pd.DataFrame()
 
@@ -32,8 +32,8 @@ def load(start_year=DEFAULT_START_YEAR, end_year=DEFAULT_END_YEAR):
     # start_year is added 1 because we don't need to iterate over the first season (no prior data)
     for season in range(start_year+1, end_year+1):
         try:
-            prior = pd.read_csv(f'./data/batting_{season-1}.csv', sep='|')
-            current = pd.read_csv(f'./data/batting_{season}.csv', sep='|')
+            prior = pd.read_csv(f'./data/batting_{season-1}.tsv', sep='|')
+            current = pd.read_csv(f'./data/batting_{season}.tsv', sep='|')
         except FileNotFoundError:
             continue
 
