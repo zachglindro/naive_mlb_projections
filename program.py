@@ -5,21 +5,20 @@ import data
 
 # TODO: add PA as ballast
 # Returns the regression model
-def start():
+def start(split=True):
     data.get(2015, 2023)
     print('Loading data...')
     pairs = data.load(2015, 2023)
 
     print('\nTraining model...')
-
-    # Split data into training and testing sets
-    X_train, X_test, y_train, y_test = train_test_split(pairs[['Barrel%_prev', 'wRC+_prev', 'K%_prev', 'BB%_prev', 'Age_prev']], pairs['wRC+_curr'], test_size=0.3, random_state=0)
-
-    # Train model
     regression = linear_model.LinearRegression()
-    regression.fit(X_train, y_train)
 
-    print(f'Score: {regression.score(X_test, y_test)}')
+    if split:
+        X_train, X_test, y_train, y_test = train_test_split(pairs[['Barrel%_prev', 'wRC+_prev', 'K%_prev', 'BB%_prev', 'Age_prev']], pairs['wRC+_curr'], test_size=0.3, random_state=0)
+        regression.fit(X_train, y_train)
+        print(f'Score: {regression.score(X_test, y_test)}')
+    else:
+        regression.fit(pairs[['Barrel%_prev', 'wRC+_prev', 'K%_prev', 'BB%_prev', 'Age_prev']], pairs['wRC+_curr'])
 
     return regression
 
@@ -51,7 +50,7 @@ def tui():
 
 # Project wRC+ for 2024 for each player
 def project2024():
-    model = start()
+    model = start(split=False)
     d23 = pd.read_csv(f'./data/batting_2023.tsv', sep='|')
 
     projections = pd.DataFrame()
@@ -69,4 +68,4 @@ def project2024():
     
     projections.to_csv('2024_projections.tsv', sep='|', index=False)
 
-tui()
+project2024()
