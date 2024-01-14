@@ -1,5 +1,5 @@
 # Naive MLB projections
-Projects next-season wRC+ based on previous season wRC+, Barrel%, K%, BB%, and age using linear regression. Model is trained on 2015-2023 data, excluding 2020.
+Projects next-season wRC+ using linear regression based on previous season wRC+, Barrel%, K%, BB%, and age. Model is trained on 2015-2023 data, excluding 2020.
 
 Notable 2024 projections:
 - Highest wRC+: Aaron Judge (161)
