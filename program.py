@@ -22,7 +22,7 @@ def start(split=True):
 
     return regression
 
-def tui():
+def project_player():
     model = start()
 
     # Predict wRC+ based on user input
@@ -68,4 +68,4 @@ def project2024():
     
     projections.to_csv('2024_projections.tsv', sep='|', index=False)
 
-project2024()
+project_player()
