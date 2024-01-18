@@ -1,2 +1,3 @@
 /__pycache__
-/data
+/data/*
+!/data/example_batting_2023.tsv
