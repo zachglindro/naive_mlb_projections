@@ -3,9 +3,10 @@ from sklearn import linear_model
 from sklearn.model_selection import train_test_split
 import data
 
+X_vars = [ 'wRC+_prev','Barrel%_prev', 'K%_prev', 'BB%_prev', 'Age_prev']
+
 # Returns the regression model
 def start(split=True):
-    X_vars = ['Barrel%_prev', 'wRC+_prev', 'K%_prev', 'BB%_prev', 'Age_prev']
 
     data.get(2015, 2023)
     print('Loading data...')
@@ -28,37 +29,55 @@ def project_player():
     model = start()
 
     while True:
-        wrc = input('\nEnter wRC+: ')
-        if wrc == 'q':
-            break
-        barrel = input('Enter Barrel%: ')
-        k = input('Enter K%: ')
-        bb = input('Enter BB%: ')
-        age = input('Enter age: ')
+        inputs = {}
 
-        try:
-            barrel = float(barrel)/100
-            wrc = float(wrc)
-            k = float(k)/100
-            bb = float(bb)/100
-            age = float(age)
-        except ValueError:
-            print('Invalid input')
-            continue
-
-        input_df = pd.DataFrame({'Barrel%_prev': barrel,
-                                 'wRC+_prev': wrc,
-                                 'K%_prev': k,
-                                 'BB%_prev': bb,
-                                 'Age_prev': age},
-                                 index=[0])
+        # Ask user for inputs to the X variables
+        for var in X_vars:
+            stripped_var = var.split('_')[0]
+            inputs[var] = input(f'Enter {stripped_var}: ')
+            if inputs[var] == 'q':
+                break
+                
+            try:
+                if '%' in var:
+                    inputs[var] = float(inputs[var])/100
+                else:
+                    inputs[var] = float(inputs[var])
+            except ValueError:
+                print('Invalid input')
+                continue
         
-        print(f'Predicted wRC+: {round(model.predict(input_df)[0])}')
+        # Output projected wRC+
+        input_df = pd.DataFrame(inputs, index=[0])
+        print(f'pwRC+: {round(model.predict(input_df)[0])}')
+
+
+'''# Projects 2024 wRC+ for each player
+def project2024():
+    X_vars = ['wRC+_prev', 'Barrel%_prev', 'K%_prev', 'BB%_prev', 'Age_prev']
+
+    model = start(split=False)
+    d23 = pd.read_csv(f'./data/batting_2023.tsv', sep='|')
+
+    projections = pd.DataFrame()
+
+    for player in d23['Name']:
+        player_data = d23[d23['Name'] == player]
+
+        input_df = pd.DataFrame({var: player_data[var].values[0] for var in X_vars}, index=[0])
+
+        projections = pd.concat([projections, pd.DataFrame({'Name': player,
+                                                            'wRC+': round(model.predict(input_df)[0])},
+                                                            index=[0])], ignore_index=True)
+    
+    projections.to_csv('2024_projections.tsv', sep='|', index=False)'''
 
 # Projects 2024 wRC+for each player
 def project2024():
+    X_vars = [ 'wRC+_prev','Barrel%_prev', 'K%_prev', 'BB%_prev', 'Age_prev']
+
     model = start(split=False)
-    d23 = pd.read_csv(f'./data/batting_2023.tsv', sep='|')
+    d23 = pd.read_csv('./data/batting_2023.tsv', sep='|')
 
     projections = pd.DataFrame()
 
