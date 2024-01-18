@@ -1,54 +1,46 @@
 import pandas as pd
 from sklearn import linear_model
 from sklearn.model_selection import train_test_split
+from sklearn.model_selection import cross_val_score
 import data
 import statsmodels.api as sm
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 
 # Variables used for the regression model
-X_vars = ['wRC+', 'Age', 'Barrel%', 'HardHit%', 'maxEV', 'O-Swing%', 'O-Contact%', 'CStr%']
+X_vars = ['wRC+', 'Age', 'Barrel%', 'HardHit%', 'maxEV', 'O-Swing%', 'O-Contact%', 'CSW%']
 Y_var = 'wRC+'
 
 X_vars = [var + '_prev' for var in X_vars]
 Y_var = Y_var + '_curr'
 
-# Returns the regression model
-def start(split=False, get_pairs=False):
-    data.get(2015, 2023)
-    print('\nLoading data...')
-    pairs = data.load(2015, 2023)
-    print('Training model...')
-    regression = linear_model.LinearRegression()
+data.get(2015, 2023)
+print('\nLoading data...')
+pairs = data.load(2015, 2023)
 
-    if split:
-        X_train, X_test, y_train, y_test = train_test_split(pairs[X_vars], pairs[Y_var], test_size=0.3, random_state=0)
-        regression.fit(X_train, y_train)
-        print(f'Score: {regression.score(X_test, y_test)}')
-    else:
-        regression.fit(pairs[X_vars], pairs[Y_var])
+print('Training model...')
+model = linear_model.LinearRegression()
+model.fit(pairs[X_vars], pairs[Y_var])
 
-    if get_pairs:
-        return regression, pairs
-    else:
-        return regression
 
 # Prints model statistics
 def ols():
-    regression, pairs = start(split=True, get_pairs=True)
+    # Print OLS summary
     X = sm.add_constant(pairs[X_vars])
     regression = sm.OLS(pairs[Y_var], X).fit()
     print(regression.summary(alpha=0.01))
 
-    # Get VIF
+    # Print VIF
     vif = pd.DataFrame()
     vif['VIF'] = [variance_inflation_factor(X.values, i) for i in range(len(X.columns))]
     vif['Variable'] = X.columns
     print('\n', vif)
+    
+    # Do k-fold cross validation
+    scores = cross_val_score(model, pairs[X_vars], pairs[Y_var], cv=4)
+    print(f'\nCross validation score: {round(scores.mean(), 4)}')
 
 # Projects wRC+ for a single player
 def project_player():
-    model = start()
-
     while True:
         inputs = {}
 
@@ -73,7 +65,6 @@ def project_player():
 
 # Projects wRC+ for every player in the given year
 def project_year(year, save_to):
-    model = start()
     data = pd.read_csv(f'./data/batting_{year-1}.tsv', sep='|')
 
     projections = pd.DataFrame()
