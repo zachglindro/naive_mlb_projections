@@ -5,7 +5,7 @@ import data
 import statsmodels.api as sm
 
 # Variables used for the regression model
-X_vars = [ 'wRC+_prev', 'Barrel%_prev', 'K%_prev', 'BB%_prev', 'Age_prev']
+X_vars = ['wRC+_prev', 'Barrel%_prev', 'K%_prev', 'BB%_prev', 'Age_prev']
 Y_var = 'wRC+_curr'
 
 # Returns the regression model
@@ -30,7 +30,7 @@ def ols():
     regression, pairs = start(split=True)
     X = sm.add_constant(pairs[X_vars])
     regression = sm.OLS(pairs[Y_var], X).fit()
-    print(regression.summary())
+    print(regression.summary(alpha=0.01))
 
 # Projects wRC+ for a single player
 def project_player():
