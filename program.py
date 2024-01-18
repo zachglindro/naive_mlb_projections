@@ -3,9 +3,10 @@ from sklearn import linear_model
 from sklearn.model_selection import train_test_split
 import data
 import statsmodels.api as sm
+from statsmodels.stats.outliers_influence import variance_inflation_factor
 
 # Variables used for the regression model
-X_vars = ['wRC+', 'Barrel%', 'O-Swing%', 'O-Contact%', 'Age', 'CStr%']
+X_vars = ['wRC+', 'Age', 'Barrel%', 'O-Swing%', 'O-Contact%', 'CStr%']
 Y_var = 'wRC+'
 
 X_vars = [var + '_prev' for var in X_vars]
@@ -14,7 +15,7 @@ Y_var = Y_var + '_curr'
 # Returns the regression model
 def start(split=False, get_pairs=False):
     data.get(2015, 2023)
-    print('Loading data...')
+    print('\nLoading data...')
     pairs = data.load(2015, 2023)
     print('Training model...')
     regression = linear_model.LinearRegression()
@@ -38,9 +39,15 @@ def ols():
     regression = sm.OLS(pairs[Y_var], X).fit()
     print(regression.summary(alpha=0.01))
 
+    # Get VIF
+    vif = pd.DataFrame()
+    vif['VIF'] = [variance_inflation_factor(X.values, i) for i in range(len(X.columns))]
+    vif['Variable'] = X.columns
+    print('\n', vif)
+
 # Projects wRC+ for a single player
 def project_player():
-    model = start(split=True)
+    model = start()
 
     while True:
         inputs = {}
@@ -49,7 +56,7 @@ def project_player():
         for var in X_vars:
             inputs[var] = input(f'Enter {var.split("_")[0]}: ')
             if inputs[var] == 'q':
-                break
+                return
                 
             try:
                 if '%' in var:
@@ -83,6 +90,27 @@ def project_year(year, save_to):
     projections.to_csv(save_to, sep='|', index=False)
     print(f"{year} projections saved to {save_to}")
 
-#ols()
-#project_player()
-project_year(2024, '2024_projections.tsv')
+def menu():
+    while True:
+        print("\nMain Menu (or [q]uit):")
+        print("1. Print Model Statistics")
+        print("2. Project wRC+ for a Single Player")
+        print("3. Project 2024 wRC+")
+        
+        choice = input("Enter your choice: ")
+        
+        if choice == '1':
+            ols()
+        elif choice == '2':
+            project_player()
+        elif choice == '3':
+            '''year = int(input("Enter the year: "))
+            if year < 2015:
+                print("\nStatcast data only available from 2015 onwards")
+                continue
+            save_to = input("Enter the file path to save to: ")'''
+            project_year(2024, '2024_projections.tsv')
+        elif choice == 'q':
+            break
+
+menu()
