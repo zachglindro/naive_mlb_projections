@@ -3,38 +3,38 @@ from sklearn import linear_model
 from sklearn.model_selection import train_test_split
 import data
 
+# Variables used for the regression model
 X_vars = [ 'wRC+_prev','Barrel%_prev', 'K%_prev', 'BB%_prev', 'Age_prev']
+Y_var = 'wRC+_curr'
 
 # Returns the regression model
-def start(split=True):
+def start(split=False):
 
     data.get(2015, 2023)
     print('Loading data...')
     pairs = data.load(2015, 2023)
-
-    print('\nTraining model...')
+    print('Training model...')
     regression = linear_model.LinearRegression()
 
     if split:
-        X_train, X_test, y_train, y_test = train_test_split(pairs[X_vars], pairs['wRC+_curr'], test_size=0.3, random_state=0)
+        X_train, X_test, y_train, y_test = train_test_split(pairs[X_vars], pairs[Y_var], test_size=0.3, random_state=0)
         regression.fit(X_train, y_train)
         print(f'Score: {regression.score(X_test, y_test)}')
     else:
-        regression.fit(pairs[X_vars], pairs['wRC+_curr'])
+        regression.fit(pairs[X_vars], pairs[Y_var])
 
     return regression
 
 # Project wRC+ for a single player
 def project_player():
-    model = start()
+    model = start(split=True)
 
     while True:
         inputs = {}
 
         # Ask user for inputs to the X variables
         for var in X_vars:
-            stripped_var = var.split('_')[0]
-            inputs[var] = input(f'Enter {stripped_var}: ')
+            inputs[var] = input(f'Enter {var.split("_")[0]}: ')
             if inputs[var] == 'q':
                 break
                 
@@ -47,57 +47,28 @@ def project_player():
                 print('Invalid input')
                 continue
         
-        # Output projected wRC+
+        # Output projected y
         input_df = pd.DataFrame(inputs, index=[0])
-        print(f'pwRC+: {round(model.predict(input_df)[0])}')
+        print(f'p{Y_var.split("_")[0]}: {round(model.predict(input_df)[0])}\n')
 
-
-'''# Projects 2024 wRC+ for each player
-def project2024():
-    X_vars = ['wRC+_prev', 'Barrel%_prev', 'K%_prev', 'BB%_prev', 'Age_prev']
-
-    model = start(split=False)
-    d23 = pd.read_csv(f'./data/batting_2023.tsv', sep='|')
+# Projects wRC+ for each player in the given year
+def project_year(year, file_name):
+    model = start()
+    data = pd.read_csv(f'./data/batting_{year-1}.tsv', sep='|')
 
     projections = pd.DataFrame()
 
-    for player in d23['Name']:
-        player_data = d23[d23['Name'] == player]
+    for player in data['Name']:
+        player_data = data[data['Name'] == player]
+        input_df = pd.DataFrame({var: player_data[var.replace('_prev', '')].values[0] for var in X_vars}, index=[0])
 
-        input_df = pd.DataFrame({var: player_data[var].values[0] for var in X_vars}, index=[0])
-
+        projected_y = round(model.predict(input_df)[0])
         projections = pd.concat([projections, pd.DataFrame({'Name': player,
-                                                            'wRC+': round(model.predict(input_df)[0])},
+                                                            f'Projected {Y_var.split("_")[0]}': projected_y},
                                                             index=[0])], ignore_index=True)
     
-    projections.to_csv('2024_projections.tsv', sep='|', index=False)'''
+    projections.to_csv(file_name, sep='|', index=False)
+    print(f"{year} projections saved to {file_name}")
 
-# Projects 2024 wRC+for each player
-def project2024():
-    X_vars = [ 'wRC+_prev','Barrel%_prev', 'K%_prev', 'BB%_prev', 'Age_prev']
-
-    model = start(split=False)
-    d23 = pd.read_csv('./data/batting_2023.tsv', sep='|')
-
-    projections = pd.DataFrame()
-
-    for player in d23['Name']:
-        barrel = d23[d23['Name'] == player]['Barrel%'].values[0]
-        wrc = d23[d23['Name'] == player]['wRC+'].values[0]
-        k = d23[d23['Name'] == player]['K%'].values[0]
-        bb = d23[d23['Name'] == player]['BB%'].values[0]
-        age = d23[d23['Name'] == player]['Age'].values[0]
-
-        input_df = pd.DataFrame({'Barrel%_prev': barrel,
-                                 'wRC+_prev': wrc,
-                                 'K%_prev': k,
-                                 'BB%_prev': bb,
-                                 'Age_prev': age}, index=[0])
-        
-        projections = pd.concat([projections, pd.DataFrame({'Name': player,
-                                                            'wRC+': round(model.predict(input_df)[0])},
-                                                            index=[0])], ignore_index=True)
-    
-    projections.to_csv('2024_projections.tsv', sep='|', index=False)
-
-project_player()
+#project_player()
+project_year(2024, '2024_projections.tsv')
