@@ -6,7 +6,7 @@ import statsmodels.api as sm
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 
 # Variables used for the regression model
-X_vars = ['wRC+', 'Age', 'Barrel%', 'O-Swing%', 'O-Contact%', 'CStr%']
+X_vars = ['wRC+', 'Age', 'Barrel%', 'HardHit%', 'maxEV', 'O-Swing%', 'O-Contact%', 'CStr%']
 Y_var = 'wRC+'
 
 X_vars = [var + '_prev' for var in X_vars]
@@ -94,7 +94,7 @@ def menu():
     while True:
         print("\nMain Menu (or [q]uit):")
         print("1. Print Model Statistics")
-        print("2. Project wRC+ for a Single Player")
+        print("2. Project Player wRC+")
         print("3. Project 2024 wRC+")
         
         choice = input("Enter your choice: ")
