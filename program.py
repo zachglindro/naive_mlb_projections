@@ -2,14 +2,14 @@ import pandas as pd
 from sklearn import linear_model
 from sklearn.model_selection import train_test_split
 import data
+import statsmodels.api as sm
 
 # Variables used for the regression model
-X_vars = [ 'wRC+_prev','Barrel%_prev', 'K%_prev', 'BB%_prev', 'Age_prev']
+X_vars = [ 'wRC+_prev', 'Barrel%_prev', 'K%_prev', 'BB%_prev', 'Age_prev']
 Y_var = 'wRC+_curr'
 
 # Returns the regression model
 def start(split=False):
-
     data.get(2015, 2023)
     print('Loading data...')
     pairs = data.load(2015, 2023)
@@ -23,9 +23,16 @@ def start(split=False):
     else:
         regression.fit(pairs[X_vars], pairs[Y_var])
 
-    return regression
+    return regression, pairs
 
-# Project wRC+ for a single player
+# Prints model statistics
+def ols():
+    regression, pairs = start(split=True)
+    X = sm.add_constant(pairs[X_vars])
+    regression = sm.OLS(pairs[Y_var], X).fit()
+    print(regression.summary())
+
+# Projects wRC+ for a single player
 def project_player():
     model = start(split=True)
 
@@ -51,8 +58,8 @@ def project_player():
         input_df = pd.DataFrame(inputs, index=[0])
         print(f'p{Y_var.split("_")[0]}: {round(model.predict(input_df)[0])}\n')
 
-# Projects wRC+ for each player in the given year
-def project_year(year, file_name):
+# Projects wRC+ for every player in the given year
+def project_year(year, save_to):
     model = start()
     data = pd.read_csv(f'./data/batting_{year-1}.tsv', sep='|')
 
@@ -67,8 +74,9 @@ def project_year(year, file_name):
                                                             f'Projected {Y_var.split("_")[0]}': projected_y},
                                                             index=[0])], ignore_index=True)
     
-    projections.to_csv(file_name, sep='|', index=False)
-    print(f"{year} projections saved to {file_name}")
+    projections.to_csv(save_to, sep='|', index=False)
+    print(f"{year} projections saved to {save_to}")
 
+ols()
 #project_player()
-project_year(2024, '2024_projections.tsv')
+#project_year(2024, '2024_projections.tsv')
