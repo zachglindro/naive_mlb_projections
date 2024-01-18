@@ -5,11 +5,14 @@ import data
 import statsmodels.api as sm
 
 # Variables used for the regression model
-X_vars = ['wRC+_prev', 'Barrel%_prev', 'K%_prev', 'BB%_prev', 'Age_prev']
-Y_var = 'wRC+_curr'
+X_vars = ['wRC+', 'Barrel%', 'O-Swing%', 'O-Contact%', 'Age', 'CStr%']
+Y_var = 'wRC+'
+
+X_vars = [var + '_prev' for var in X_vars]
+Y_var = Y_var + '_curr'
 
 # Returns the regression model
-def start(split=False):
+def start(split=False, get_pairs=False):
     data.get(2015, 2023)
     print('Loading data...')
     pairs = data.load(2015, 2023)
@@ -23,11 +26,14 @@ def start(split=False):
     else:
         regression.fit(pairs[X_vars], pairs[Y_var])
 
-    return regression, pairs
+    if get_pairs:
+        return regression, pairs
+    else:
+        return regression
 
 # Prints model statistics
 def ols():
-    regression, pairs = start(split=True)
+    regression, pairs = start(split=True, get_pairs=True)
     X = sm.add_constant(pairs[X_vars])
     regression = sm.OLS(pairs[Y_var], X).fit()
     print(regression.summary(alpha=0.01))
@@ -77,6 +83,6 @@ def project_year(year, save_to):
     projections.to_csv(save_to, sep='|', index=False)
     print(f"{year} projections saved to {save_to}")
 
-ols()
+#ols()
 #project_player()
-#project_year(2024, '2024_projections.tsv')
+project_year(2024, '2024_projections.tsv')
