@@ -7,7 +7,7 @@ import statsmodels.api as sm
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 
 # Variables used for the regression model
-X_vars = ['wRC+', 'Age', 'Barrel%', 'HardHit%', 'maxEV', 'O-Swing%', 'O-Contact%', 'CSW%']
+X_vars = ['wRC+', 'Age', 'maxEV', 'LA', 'HardHit%', 'O-Swing%', 'O-Contact%', 'CStr%']
 Y_var = 'wRC+'
 
 X_vars = [var + '_prev' for var in X_vars]
