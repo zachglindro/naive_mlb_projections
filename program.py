@@ -65,19 +65,26 @@ def project_player():
 
 # Projects wRC+ for every player in the given year
 def project_year(year, save_to):
+    projections = pd.DataFrame()
+    to_be_projected = Y_var.split("_")[0]
+
     data = pd.read_csv(f'./data/batting_{year-1}.tsv', sep='|')
 
-    projections = pd.DataFrame()
-
+    # For each player, project wRC+ based on their stats
     for player in data['Name']:
+        # Get player data
         player_data = data[data['Name'] == player]
+
+        # Get the stats that we need
         input_df = pd.DataFrame({var: player_data[var.replace('_prev', '')].values[0] for var in X_vars}, index=[0])
 
+        # Project wRC+, add to dataframe
         projected_y = round(model.predict(input_df)[0])
         projections = pd.concat([projections, pd.DataFrame({'Name': player,
-                                                            f'Projected {Y_var.split("_")[0]}': projected_y},
+                                                            f'Projected {to_be_projected}': projected_y},
                                                             index=[0])], ignore_index=True)
     
+    projections.sort_values(by=f"Projected {to_be_projected}", ascending=False, inplace=True)
     projections.to_csv(save_to, sep='|', index=False)
     print(f"{year} projections saved to {save_to}")
 
@@ -95,11 +102,6 @@ def menu():
         elif choice == '2':
             project_player()
         elif choice == '3':
-            '''year = int(input("Enter the year: "))
-            if year < 2015:
-                print("\nStatcast data only available from 2015 onwards")
-                continue
-            save_to = input("Enter the file path to save to: ")'''
             project_year(2024, '2024_projections.tsv')
         elif choice == 'q':
             break
