@@ -80,10 +80,14 @@ def project_year(year, model, X_vars, Y_var):
     print(f"\n{year} projections saved to {file_name}")
 
 def menu():
+    data_functions.get(2015, 2023)
+    print('\nLoading data...')
+    data = data_functions.load(2015, 2023)
+
     variables = {
         "wRC+": ['wRC+', 'Age', 'maxEV', 'LA', 'HardHit%', 'O-Swing%', 'O-Contact%', 'CStr%'],
-        "BB%": ['BB%', 'O-Swing%', 'Barrel%'],
-        'K%': ['K%', 'O-Contact%']
+        "BB%": ['BB%', 'O-Swing%', 'Barrel%', 'ISO'],
+        'K%': ['K%', 'Z-Swing%', 'O-Contact%', 'Z-Contact%'],
     }
 
     while True:
@@ -100,36 +104,31 @@ def menu():
         if choice in variables:
             X_vars = [var + '_prev' for var in variables[choice]]
             Y_var = choice + '_curr'
-            break
         elif choice == 'q':
             return
         else:
             print(f'Only {", ".join(variables.keys())} are valid choices.')
             continue
 
-    data_functions.get(2015, 2023)
-    print('\nLoading data...')
-    data = data_functions.load(2015, 2023)
+        print('\nTraining model...')
+        model = linear_model.LinearRegression()
+        model.fit(data[X_vars], data[Y_var])
 
-    print('Training model...')
-    model = linear_model.LinearRegression()
-    model.fit(data[X_vars], data[Y_var])
-
-    while True:
-        print("\nMain Menu (or [q]uit):")
-        print("1. Print Model Statistics")
-        print(f"2. Project Player {Y_var.removesuffix('_curr')}")
-        print(f"3. Project 2024 {Y_var.removesuffix('_curr')}")
-        
-        choice = input("> ")
-        
-        if choice == '1':
-            ols(data, model, X_vars, Y_var)
-        elif choice == '2':
-            project_player(model, X_vars, Y_var)
-        elif choice == '3':
-            project_year(2024, model, X_vars, Y_var)
-        elif choice == 'q':
-            return
+        while True:
+            print("\nMain Menu (or [q]uit):")
+            print("1. Print Model Statistics")
+            print(f"2. Project Player {Y_var.removesuffix('_curr')}")
+            print(f"3. Project 2024 {Y_var.removesuffix('_curr')}")
+            
+            choice = input("> ")
+            
+            if choice == '1':
+                ols(data, model, X_vars, Y_var)
+            elif choice == '2':
+                project_player(model, X_vars, Y_var)
+            elif choice == '3':
+                project_year(2024, model, X_vars, Y_var)
+            elif choice == 'q':
+                break
 
 menu()
