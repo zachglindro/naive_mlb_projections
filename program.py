@@ -64,7 +64,9 @@ def project_player():
         print(f'p{Y_var.split("_")[0]}: {round(model.predict(input_df)[0])}\n')
 
 # Projects wRC+ for every player in the given year
-def project_year(year, save_to):
+def project_year(year):
+    file_name = f'{year}_{Y_var}_projections.tsv'
+
     projections = pd.DataFrame()
     to_be_projected = Y_var.split("_")[0]
 
@@ -85,8 +87,9 @@ def project_year(year, save_to):
                                                             index=[0])], ignore_index=True)
     
     projections.sort_values(by=f"Projected {to_be_projected}", ascending=False, inplace=True)
-    projections.to_csv(save_to, sep='|', index=False)
-    print(f"{year} projections saved to {save_to}")
+    projections.to_csv(file_name, sep='|', index=False)
+    #projections.to_csv(save_to, sep='|', index=False)
+    print(f"{year} projections saved to {file_name}")
 
 def menu():
     while True:
@@ -102,7 +105,7 @@ def menu():
         elif choice == '2':
             project_player()
         elif choice == '3':
-            project_year(2024, '2024_projections.tsv')
+            project_year(2024)
         elif choice == 'q':
             break
 
