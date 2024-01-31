@@ -50,24 +50,29 @@ def project_player(model, X_vars, Y_var):
 
 # Projects wRC+ for every player in the given year
 def project_year(year, model, X_vars, Y_var):
-    file_name = f'{year}_{Y_var}_projections.tsv'
+    to_be_projected = Y_var.removesuffix('_curr')
 
     projections = pd.DataFrame()
-    to_be_projected = Y_var.split("_")[0] # Remove _curr from the variable name
-
     data = pd.read_csv(f'./data/batting_{year-1}.tsv', sep='|')
 
     # For each player, project wRC+ based on their stats
     for player in data['Name']:
+        # Get player data
         player_data = data[data['Name'] == player]
+
+        # Get the stats that we need
         input_df = pd.DataFrame({var: player_data[var.replace('_prev', '')].values[0] for var in X_vars}, index=[0])
 
+        # Project wRC+, add to dataframe
         projected_y = round(model.predict(input_df)[0])
         projections = pd.concat([projections, pd.DataFrame({'Name': player,
                                                             f'Projected {to_be_projected}': projected_y},
                                                             index=[0])], ignore_index=True)
     
+    # Save the projections
     projections.sort_values(by=f"Projected {to_be_projected}", ascending=False, inplace=True)
+
+    file_name = f'{year}_{to_be_projected}_projections.tsv'
     projections.to_csv(file_name, sep='|', index=False)
     print(f"\n{year} projections saved to {file_name}")
 
@@ -110,8 +115,8 @@ def menu():
     while True:
         print("\nMain Menu (or [q]uit):")
         print("1. Print Model Statistics")
-        print(f"2. Project Player {choice}")
-        print(f"3. Project 2024 {choice}")
+        print(f"2. Project Player {Y_var.removesuffix('_curr')}")
+        print(f"3. Project 2024 {Y_var.removesuffix('_curr')}")
         
         choice = input("> ")
         
