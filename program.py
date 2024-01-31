@@ -64,7 +64,10 @@ def project_year(year, model, X_vars, Y_var):
         input_df = pd.DataFrame({var: player_data[var.replace('_prev', '')].values[0] for var in X_vars}, index=[0])
 
         # Project wRC+, add to dataframe
-        projected_y = round(model.predict(input_df)[0])
+        if '%' in X_vars[0]:
+            projected_y = round(model.predict(input_df)[0],3)
+        else:
+            projected_y = round(model.predict(input_df)[0])
         projections = pd.concat([projections, pd.DataFrame({'Name': player,
                                                             f'Projected {to_be_projected}': projected_y},
                                                             index=[0])], ignore_index=True)
@@ -77,7 +80,7 @@ def project_year(year, model, X_vars, Y_var):
     print(f"\n{year} projections saved to {file_name}")
 
 def menu():
-    choices = {
+    variables = {
         "wRC+": ['wRC+', 'Age', 'maxEV', 'LA', 'HardHit%', 'O-Swing%', 'O-Contact%', 'CStr%'],
         "BB%": ['BB%', 'O-Swing%'],
         'K%': ['K%', 'O-Contact%']
@@ -90,18 +93,18 @@ def menu():
         # Allow entering number instead of stat name for quick testing
         try:
             choice = int(choice)
-            choice = list(choices.keys())[choice-1]
+            choice = list(variables.keys())[choice-1]
         except:
             pass
     
-        if choice in choices:
-            X_vars = [var + '_prev' for var in choices[choice]]
+        if choice in variables:
+            X_vars = [var + '_prev' for var in variables[choice]]
             Y_var = choice + '_curr'
             break
         elif choice == 'q':
             return
         else:
-            print(f'Only {", ".join(choices.keys())} are valid choices.')
+            print(f'Only {", ".join(variables.keys())} are valid choices.')
             continue
 
     data_functions.get(2015, 2023)
