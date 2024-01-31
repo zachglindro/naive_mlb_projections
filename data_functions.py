@@ -25,7 +25,8 @@ def get(start_year=DEFAULT_START_YEAR, end_year=DEFAULT_END_YEAR, exclude_2020=T
 
     return 0
 
-# Loads the data by matching the player names from consecutive seasons
+# Matches the player names from consecutive seasons.
+# Output is a dataframe with the data from the previous season and the current season
 def load(start_year=DEFAULT_START_YEAR, end_year=DEFAULT_END_YEAR):
     pairs = pd.DataFrame()
 
