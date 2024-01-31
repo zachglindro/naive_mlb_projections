@@ -82,7 +82,7 @@ def project_year(year, model, X_vars, Y_var):
 def menu():
     variables = {
         "wRC+": ['wRC+', 'Age', 'maxEV', 'LA', 'HardHit%', 'O-Swing%', 'O-Contact%', 'CStr%'],
-        "BB%": ['BB%', 'O-Swing%'],
+        "BB%": ['BB%', 'O-Swing%', 'Barrel%'],
         'K%': ['K%', 'O-Contact%']
     }
 
