@@ -49,7 +49,7 @@ def project_year(year, model, X_vars, Y_var):
     to_be_projected = Y_var.removesuffix('_curr')
 
     projections = pd.DataFrame()
-    data = pd.read_csv(f'./data/batting_{year-1}.tsv', sep='|')
+    data = pd.read_csv(f'./data/batting_{year-1}.csv')
 
     # For each player, project wRC+ based on their stats
     for player in data['Name']:
@@ -74,7 +74,6 @@ def project_year(year, model, X_vars, Y_var):
 
 def menu():
     data_functions.get(2015, 2023)
-    print('\nLoading data...')
     data = data_functions.load(2015, 2023)
 
     variables = {
@@ -104,7 +103,8 @@ def menu():
                 model.fit(data[X_vars], data[Y_var])
 
                 project_year(2024, model, X_vars, Y_var)
-                continue
+            
+            continue
         elif choice in variables:
             X_vars = [var + '_prev' for var in variables[choice]]
             Y_var = choice + '_curr'
