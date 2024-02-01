@@ -66,10 +66,10 @@ def project_year(year, model, X_vars, Y_var):
                                                             index=[0])], ignore_index=True)
     
     # Save the projections
-    file_name = f'{year}_{to_be_projected}_projections.tsv'
+    file_name = f'{year}_{to_be_projected}_projections.csv'
 
     projections.sort_values(by=f"Projected {to_be_projected}", ascending=False, inplace=True)
-    projections.to_csv(file_name, sep='|', index=False)
+    projections.to_csv(file_name, sep=',', index=False, quoting=1)
     print(f"\n{year} projections saved to {file_name}")
 
 def menu():
