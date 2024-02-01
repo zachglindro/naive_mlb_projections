@@ -22,32 +22,25 @@ def get(start_year=DEFAULT_START_YEAR, end_year=DEFAULT_END_YEAR, exclude_2020=T
         data = pb.batting_stats(season, qual=MINIMUM_PA, ind=1)
         data.to_csv(f'data/batting_{season}.csv')
 
-# Matches the player names from consecutive seasons.
-# Output is a dataframe with the data from the previous season and the current season
+# Load batter data for the model
 def load(start_year=DEFAULT_START_YEAR, end_year=DEFAULT_END_YEAR):
     data = pd.DataFrame()
 
-    # For each season, match the player names with the previous season
-    # start_year+1 because we don't need to iterate over the first season
-    for season in tqdm(range(start_year+1, end_year+1), desc='Loading data'):
+    all_data = {}
+    for season in range(start_year, end_year+1):
         try:
-            prior = pd.read_csv(f'./data/batting_{season-1}.csv')
-            current = pd.read_csv(f'./data/batting_{season}.csv')
+            all_data[season] = pd.read_csv(f'./data/batting_{season}.csv')
         except FileNotFoundError:
             continue
 
-        for player in current['Name']:
-            if player in prior['Name'].values:
-                # Get the player's data from the previous season and the current season
-                player_prior = prior[prior['Name'] == player]
-                player_current = current[current['Name'] == player]
+    for season in tqdm(range(start_year+1, end_year+1), desc='Loading data'):
+        prior = all_data.get(season-1)
+        current = all_data.get(season)
 
-                # Rename the columns
-                player_prior.columns = [f'{col}_prev' for col in player_prior.columns]
-                player_current.columns = [f'{col}_curr' for col in player_current.columns]
+        if prior is None or current is None:
+            continue
 
-                # Concatenate the dataframes
-                player_data = pd.concat([player_prior.reset_index(drop=True), player_current.reset_index(drop=True)], axis=1)
-                data = pd.concat([data, player_data], ignore_index=True)
+        merged_data = pd.merge(prior, current, on='Name', suffixes=('_prev', '_curr'))
+        data = pd.concat([data, merged_data], ignore_index=True)
 
     return data
