@@ -9,18 +9,15 @@ from statsmodels.stats.outliers_influence import variance_inflation_factor
 def ols(data, model, X_vars, Y_var):
     with_constant = sm.add_constant(data[X_vars])
 
-    # Print OLS summary
     regression = sm.OLS(data[Y_var], with_constant).fit()
     print(regression.summary(alpha=0.01))
 
-    # Print VIF
     vif = pd.DataFrame({
         'VIF': [variance_inflation_factor(with_constant.values, i) for i in range(len(with_constant.columns))],
         'Variable': with_constant.columns
     })
     print('\n', vif)
     
-    # Do 4-fold cross validation
     scores = cross_val_score(model, data[X_vars], data[Y_var], cv=4)
     print(f'\nCross validation score: {round(scores.mean(), 4)}')
 
@@ -29,7 +26,6 @@ def project_player(model, X_vars, Y_var):
     while True:
         inputs = {}
 
-        # Ask user for inputs to the X variables
         for var in X_vars:
             inputs[var] = input(f'Enter {var.split("_")[0]}: ')
             if inputs[var] == 'q':
@@ -57,25 +53,22 @@ def project_year(year, model, X_vars, Y_var):
 
     # For each player, project wRC+ based on their stats
     for player in data['Name']:
-        # Get player data
         player_data = data[data['Name'] == player]
-
-        # Get the stats that we need
         input_df = pd.DataFrame({var: player_data[var.replace('_prev', '')].values[0] for var in X_vars}, index=[0])
 
-        # Project wRC+, add to dataframe
         if '%' in X_vars[0]:
             projected_y = round(model.predict(input_df)[0],3)
         else:
             projected_y = round(model.predict(input_df)[0])
+            
         projections = pd.concat([projections, pd.DataFrame({'Name': player,
                                                             f'Projected {to_be_projected}': projected_y},
                                                             index=[0])], ignore_index=True)
     
     # Save the projections
-    projections.sort_values(by=f"Projected {to_be_projected}", ascending=False, inplace=True)
-
     file_name = f'{year}_{to_be_projected}_projections.tsv'
+
+    projections.sort_values(by=f"Projected {to_be_projected}", ascending=False, inplace=True)
     projections.to_csv(file_name, sep='|', index=False)
     print(f"\n{year} projections saved to {file_name}")
 
@@ -100,8 +93,19 @@ def menu():
             choice = list(variables.keys())[choice-1]
         except:
             pass
-    
-        if choice in variables:
+            
+        if choice == 'a':
+            for stat in variables:
+                X_vars = [var + '_prev' for var in variables[stat]]
+                Y_var = stat + '_curr'
+
+                print(f'\nTraining model for {stat}...')
+                model = linear_model.LinearRegression()
+                model.fit(data[X_vars], data[Y_var])
+
+                project_year(2024, model, X_vars, Y_var)
+                continue
+        elif choice in variables:
             X_vars = [var + '_prev' for var in variables[choice]]
             Y_var = choice + '_curr'
         elif choice == 'q':
