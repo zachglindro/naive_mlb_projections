@@ -7,10 +7,13 @@ DEFAULT_START_YEAR = 2015
 DEFAULT_END_YEAR = 2023
 MINIMUM_PA = 300
 
-# Get batter data for the model, minimum 300 PA
+# Get batter data for the model
 def get(start_year=DEFAULT_START_YEAR, end_year=DEFAULT_END_YEAR, exclude_2020=True, force_update=False):
     if not os.path.exists('data'):
         os.mkdir('data')
+
+    if not os.path.exists('projections'):
+        os.mkdir('projections')
 
     for season in tqdm(range(start_year, end_year+1), desc='Getting data'):
         if season == 2020 and exclude_2020:

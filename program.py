@@ -1,7 +1,7 @@
+import data_functions
 import pandas as pd
 from sklearn import linear_model
 from sklearn.model_selection import cross_val_score
-import data_functions
 import statsmodels.api as sm
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 
@@ -69,7 +69,7 @@ def project_year(year, model, X_vars, Y_var):
     file_name = f'{year}_{to_be_projected}_projections.csv'
 
     projections.sort_values(by=f"Projected {to_be_projected}", ascending=False, inplace=True)
-    projections.to_csv(file_name, sep=',', index=False, quoting=1)
+    projections.to_csv(f'projections/{file_name}', index=False, quoting=1)
     print(f"\n{year} projections saved to {file_name}")
 
 def menu():
@@ -83,7 +83,7 @@ def menu():
     }
 
     while True:
-        print("\nPick a stat to project (or [q]uit):")
+        print("\nPick [a] stat to project (or [q]uit):")
         choice = input("> ")
 
         # Allow entering number instead of stat name for quick testing
@@ -132,6 +132,8 @@ def menu():
                 project_player(model, X_vars, Y_var)
             elif choice == '3':
                 project_year(2024, model, X_vars, Y_var)
+            elif choice == 'qq':
+                return
             elif choice == 'q':
                 break
 
