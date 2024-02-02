@@ -5,7 +5,7 @@ from tqdm import tqdm
 
 DEFAULT_START_YEAR = 2015
 DEFAULT_END_YEAR = 2023
-MINIMUM_PA = 300
+MINIMUM_PA = 50
 
 # Get batter data for the model
 def get(start_year=DEFAULT_START_YEAR, end_year=DEFAULT_END_YEAR, exclude_2020=True, force_update=False):
