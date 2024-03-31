@@ -3,13 +3,14 @@ import pandas as pd
 from sklearn.model_selection import cross_val_score
 import statsmodels.api as sm
 from statsmodels.stats.outliers_influence import variance_inflation_factor
+import matplotlib.pyplot as plt
 
-def ols(data, model, x, y):
+def ols(data, model, x, y, print_graphs=False):
     """Prints model statistics"""
     with_constant = sm.add_constant(data[x])
 
     regression = sm.OLS(data[y], with_constant).fit()
-    print(regression.summary(alpha=0.01))
+    print(regression.summary())
 
     vif = pd.DataFrame({
         'VIF': [variance_inflation_factor(with_constant.values, i)
@@ -17,6 +18,15 @@ def ols(data, model, x, y):
         'Variable': with_constant.columns
     })
     print('\n', vif)
+
+    # Print scatter plots of each variable against y
+    if print_graphs:
+        for var in x:
+            plt.scatter(data[var], data[y])
+            plt.xlabel(var)
+            plt.ylabel(y)
+            plt.savefig(f'graphs/{y.split("_")[0]}/{var.split("_")[0]}.png')
+            plt.close()
 
     scores = cross_val_score(model, data[x], data[y], cv=4)
     print(f'\nCross validation score: {round(scores.mean(), 4)}')

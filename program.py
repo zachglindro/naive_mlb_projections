@@ -58,6 +58,8 @@ def menu():
 
             if choice == '1':
                 bp.ols(data, model, x, y)
+            elif choice == '1p':
+                bp.ols(data, model, x, y, print_graphs=True)
             elif choice == '2':
                 bp.project_player(model, x, y)
             elif choice == '3':
