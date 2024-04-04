@@ -8,7 +8,6 @@ def menu():
     data = data_functions.load(2015, 2023)
 
     variables = {
-        # Age, BB%, K%, BABIP, SLG, EV, maxEV, LA, Barrel%, HardHit%, xBA, GB/FB, IFFB%, BUH%, Pull%, Oppo%, O-Swing%
         "wRC+": ['Age', 'BB%', 'K%', 'BABIP', 'SLG', 'EV', 'maxEV', 'LA', 'Barrel%', 'HardHit%', 'xBA', 'GB/FB', 'IFFB%', 'BUH%', 'Pull%', 'Oppo%', 'O-Swing%'],
         "BB%": ['BB%', 'O-Swing%', 'Barrel%', 'ISO'],
         'K%': ['K%', 'Z-Swing%', 'O-Contact%', 'Z-Contact%'],
@@ -18,14 +17,15 @@ def menu():
         print("\nPick [a] stat to project (or [q]uit):")
         choice = input("> ")
 
-        # Allow entering number instead of stat name for quick testing
         try:
+            # If the user enters a number, convert it to the corresponding variable
             choice = int(choice)
             choice = list(variables.keys())[choice-1]
         except (ValueError, IndexError):
             pass
 
         if choice == 'a':
+            # Project each variable
             for x, y in variables.items():
                 x = [var + '_prev' for var in x]
                 y = y + '_curr'
