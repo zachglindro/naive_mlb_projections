@@ -7,7 +7,8 @@ def menu():
     data = data_functions.load(2015, 2023)
 
     variables = {
-        "wRC+": ['wRC+', 'Age', 'maxEV', 'LA', 'HardHit%', 'O-Swing%', 'O-Contact%', 'CStr%'],
+        # Age, BB%, K%, BABIP, SLG, EV, maxEV, LA, Barrel%, HardHit%, xBA, GB/FB, IFFB%, BUH%, Pull%, Oppo%, O-Swing%
+        "wRC+": ['Age', 'BB%', 'K%', 'BABIP', 'SLG', 'EV', 'maxEV', 'LA', 'Barrel%', 'HardHit%', 'xBA', 'GB/FB', 'IFFB%', 'BUH%', 'Pull%', 'Oppo%', 'O-Swing%'],
         "BB%": ['BB%', 'O-Swing%', 'Barrel%', 'ISO'],
         'K%': ['K%', 'Z-Swing%', 'O-Contact%', 'Z-Contact%'],
     }
