@@ -22,7 +22,7 @@ def info(data, model, x, y, print_graphs=False):
     print('\n', vif)
 
     # Perform cross validation
-    scores = cross_val_score(model, data[x], data[y], cv=4)
+    scores = cross_val_score(model, data[x], data[y], cv=10)
     print(f'\nCross validation score: {round(scores.mean(), 4)}')
 
     # Print scatter plots of each variable against y
