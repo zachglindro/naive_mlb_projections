@@ -4,6 +4,8 @@ import batter_projection as bp
 import os
 
 def menu():
+    model = linear_model.LassoLarsCV(cv=10)
+
     data_functions.get(2015, 2023)
     data = data_functions.load(2015, 2023)
 
@@ -14,8 +16,6 @@ def menu():
     }
 
     while True:
-        model = linear_model.LassoLarsCV(cv=10)
-
         print("\nPick [a] stat to project (or [q]uit):")
         choice = input("> ")
 
