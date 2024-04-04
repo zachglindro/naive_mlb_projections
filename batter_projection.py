@@ -5,13 +5,15 @@ import statsmodels.api as sm
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 import matplotlib.pyplot as plt
 
-def ols(data, model, x, y, print_graphs=False):
-    """Prints model statistics"""
+def info(data, model, x, y, print_graphs=False):
+    """Print model summary, VIF, and (optionally) scatter plots"""
     with_constant = sm.add_constant(data[x])
 
+    # Fit regression model
     regression = sm.OLS(data[y], with_constant).fit()
     print(regression.summary())
 
+    # Calculate VIF
     vif = pd.DataFrame({
         'VIF': [variance_inflation_factor(with_constant.values, i)
                 for i in range(len(with_constant.columns))],
@@ -19,23 +21,30 @@ def ols(data, model, x, y, print_graphs=False):
     })
     print('\n', vif)
 
+    # Perform cross validation
+    scores = cross_val_score(model, data[x], data[y], cv=4)
+    print(f'\nCross validation score: {round(scores.mean(), 4)}')
+
     # Print scatter plots of each variable against y
     if print_graphs:
+        print('\nGenerating scatter plots...')
         for var in x:
             plt.scatter(data[var], data[y])
             plt.xlabel(var)
             plt.ylabel(y)
+
+            if "/" in var:
+                var = var.replace("/", "_")
             plt.savefig(f'graphs/{y.split("_")[0]}/{var.split("_")[0]}.png')
+
             plt.close()
 
-    scores = cross_val_score(model, data[x], data[y], cv=4)
-    print(f'\nCross validation score: {round(scores.mean(), 4)}')
-
 def project_player(model, x, y):
-    """Projects wRC+ for a single player"""
+    """Project y for a single player"""
     while True:
         inputs = {}
 
+        # Input x values
         for var in x:
             inputs[var] = input(f'Enter {var.split("_")[0]}: ')
             if inputs[var] == 'q':
@@ -55,18 +64,19 @@ def project_player(model, x, y):
         print(f'p{y.split("_")[0]}: {round(model.predict(input_df)[0])}\n')
 
 def project_year(year, model, x, y):
-    """Projects wRC+ for every player in the given year"""
+    """Project y for each player in a given year"""
     to_be_projected = y.removesuffix('_curr')
 
     projections = pd.DataFrame()
     data = pd.read_csv(f'./data/batting_{year-1}.csv')
 
-    # For each player, project wRC+ based on their stats
+    # For each player, project y based on their stats
     for player in data['Name']:
         player_data = data[data['Name'] == player]
         input_df = pd.DataFrame({var: player_data[var.replace('_prev', '')].values[0] for var in x},
                                 index=[0])
 
+        # Round y to nearest integer unless it's a percentage
         if '%' in x[0]:
             projected_y = round(model.predict(input_df)[0],3)
         else:

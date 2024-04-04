@@ -1,6 +1,7 @@
 from sklearn import linear_model
 import data_functions
 import batter_projection as bp
+import os
 
 def menu():
     data_functions.get(2015, 2023)
@@ -58,9 +59,16 @@ def menu():
             choice = input("> ")
 
             if choice == '1':
-                bp.ols(data, model, x, y)
+                bp.info(data, model, x, y)
             elif choice == '1p':
-                bp.ols(data, model, x, y, print_graphs=True)
+                directory = f'graphs/{y.split("_")[0]}'
+
+                if not os.path.exists(directory):
+                    os.makedirs(directory)
+                for file in os.listdir(directory):
+                    os.remove(os.path.join(directory, file))
+
+                bp.info(data, model, x, y, print_graphs=True)
             elif choice == '2':
                 bp.project_player(model, x, y)
             elif choice == '3':
