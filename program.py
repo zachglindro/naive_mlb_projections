@@ -53,8 +53,7 @@ def menu():
         while True:
             print("\nMain Menu (or [q]uit):")
             print("1. Print Model Statistics")
-            print(f"2. Project Player {y.removesuffix('_curr')}")
-            print(f"3. Project 2024 {y.removesuffix('_curr')}")
+            print(f"2. Project 2024 {y.removesuffix('_curr')}")
 
             choice = input("> ")
 
@@ -70,8 +69,6 @@ def menu():
 
                 bp.info(data, model, x, y, print_graphs=True)
             elif choice == '2':
-                bp.project_player(model, x, y)
-            elif choice == '3':
                 bp.project_year(2024, model, x, y)
             elif choice == 'qq':
                 return

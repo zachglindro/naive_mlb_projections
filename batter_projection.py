@@ -39,30 +39,6 @@ def info(data, model, x, y, print_graphs=False):
 
             plt.close()
 
-def project_player(model, x, y):
-    """Project y for a single player"""
-    while True:
-        inputs = {}
-
-        # Input x values
-        for var in x:
-            inputs[var] = input(f'Enter {var.split("_")[0]}: ')
-            if inputs[var] == 'q':
-                return
-
-            try:
-                if '%' in var:
-                    inputs[var] = float(inputs[var])/100
-                else:
-                    inputs[var] = float(inputs[var])
-            except ValueError:
-                print('Invalid input')
-                continue
-
-        # Output projected y
-        input_df = pd.DataFrame(inputs, index=[0])
-        print(f'p{y.split("_")[0]}: {round(model.predict(input_df)[0])}\n')
-
 def project_year(year, model, x, y):
     """Project y for each player in a given year"""
     to_be_projected = y.removesuffix('_curr')
