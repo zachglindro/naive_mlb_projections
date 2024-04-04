@@ -4,6 +4,8 @@ import batter_projection as bp
 import os
 
 def menu():
+    model = linear_model.LinearRegression()
+
     data_functions.get(2015, 2023)
     data = data_functions.load(2015, 2023)
 
@@ -31,7 +33,6 @@ def menu():
                 y = y + '_curr'
 
                 print(f'\nTraining model for {y}...')
-                model = linear_model.LinearRegression()
                 model.fit(data[x], data[y])
 
                 bp.project_year(2024, model, x, y)
@@ -47,7 +48,6 @@ def menu():
             continue
 
         print('\nTraining model...')
-        model = linear_model.LinearRegression()
         model.fit(data[x], data[y])
 
         while True:
