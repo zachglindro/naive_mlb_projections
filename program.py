@@ -14,7 +14,7 @@ def menu():
     }
 
     while True:
-        model = linear_model.LassoLarsCV()
+        model = linear_model.LassoLarsCV(cv=10)
 
         print("\nPick [a] stat to project (or [q]uit):")
         choice = input("> ")
