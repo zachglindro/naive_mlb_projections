@@ -2,7 +2,6 @@
 import os
 import pybaseball as pb
 import pandas as pd
-from tqdm import tqdm
 
 DEFAULT_START_YEAR = 2015
 DEFAULT_END_YEAR = 2023
@@ -11,7 +10,8 @@ MINIMUM_PA = 300
 def get(start_year=DEFAULT_START_YEAR, end_year=DEFAULT_END_YEAR,
         exclude_2020=True, force_update=False):
     """Gets batter data per season"""
-    for season in tqdm(range(start_year, end_year+1-exclude_2020), desc='Getting data'):
+    print("Getting data...")
+    for season in range(start_year, end_year+1):
         if season == 2020 and exclude_2020:
             continue
 
@@ -32,7 +32,8 @@ def load(start_year=DEFAULT_START_YEAR, end_year=DEFAULT_END_YEAR):
         except FileNotFoundError:
             continue
 
-    for season in tqdm(range(start_year+1, end_year+1), desc='Loading data'):
+    print("Merging data...")
+    for season in range(start_year+1, end_year+1):
         prior = all_data.get(season-1)
         current = all_data.get(season)
 
