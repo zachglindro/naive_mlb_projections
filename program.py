@@ -11,7 +11,8 @@ def menu():
 
     variables = {
         "wRC+": ['Age', 'BB%', 'K%', 'BABIP', 'SLG', 'EV', 'maxEV', 'LA', 'Barrel%', 'HardHit%', 'xBA', 'GB/FB', 'IFFB%', 'BUH%', 'Pull%', 'Oppo%', 'O-Swing%'],
-        "BB%": ['BB%', 'O-Swing%', 'Barrel%', 'ISO'],
+        # BB%, K%, ISO, xwOBA, EV, GB%, IFFB%, IFH%, Cent%, Oppo%, O-Swing%, Z-Contact%
+        "BB%": ['BB%', 'K%', 'ISO', 'xwOBA', 'EV', 'GB%', 'IFFB%', 'IFH%', 'Cent%', 'Oppo%', 'F-Strike%', 'CStr%'],
         'K%': ['K%', 'Z-Swing%', 'O-Contact%', 'Z-Contact%'],
     }
 
